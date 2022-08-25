@@ -8,7 +8,7 @@ package MainPack;
 import MySQL_DB.Model;
 import java.sql.*;
 import java.time.LocalDate;
-
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,11 +100,11 @@ public class Repository {
         return list;
     }
     
-    public void regOrder(String name, String phone, String email, String address, int[] articuls, int num) throws SQLException{
+    public void regOrder(String name, String phone, String email, String address, String[] articuls, int num) throws SQLException{
         /*if(name == null || phone == null || email == null || address == null ||
                 articuls == null || num == 0){
             throw new IllegalArgumentException("Не заданы аргументы!");
-        }*/
+        }
         int dbid = 0;
         LocalDate date;
         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql?zeroDateTimeBehavior=CONVERT_TO_NULL", "root", "C_1kr2161240");
@@ -118,19 +118,23 @@ public class Repository {
         }
         System.out.println(dbid);
         dbid++;
-        System.out.println(dbid);
+        System.out.println(dbid);*/
         
         
         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql?zeroDateTimeBehavior=CONVERT_TO_NULL", "root", "C_1kr2161240");
             Statement stm = con.createStatement()){
             if(articuls.length==1){
                 stm.executeUpdate("INSERT INTO javadev.orders "
-                        + "(id, orderdate, customername, phone, email, address, status, shipdate) VALUES (" +
-                        + dbid + ", '" + LocalDate.now() + "', \""
-                        + name + "\", \"" + phone + "\", \"" + email + "\", \"" + address + "\", \"S"  + "\", '" + LocalDate.now() + "')");
-            } else {
+                        + "(id, orderdate, customername, phone, email, address, status, shipdate) VALUES"
+                        + "((SELECT * FROM (SELECT MAX(id) FROM javadev.orders) AS t)+1, '"
+                        + LocalDate.now() + "', \""
+                        + name + "\", \"" + phone + "\", \"" + email + "\", \"" + address
+                        + "\", \"S"  + "\", '" + LocalDate.now() + "')");
+                stm.executeUpdate("INSERT INTO javadev.orderpos (ordercode, articul, price, num)\n" +
+                    "VALUES ((SELECT MAX(id) FROM javadev.orders), \"" + articuls[0]
+                        + "\", (SELECT price FROM javadev.products WHERE javadev.products.articul=\""
+                        + articuls[0] + "\"), " + num + ")");
                
-                
             }
         } catch (SQLException ex) {
         ex.printStackTrace();
