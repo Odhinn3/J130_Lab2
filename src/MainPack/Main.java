@@ -16,7 +16,6 @@ public class Main {
         repo.getModelByID(3);
         int[] articuls = new int[] {3251516};
         System.out.println(LocalDate.now());
-        repo.regOrder("TEST", "(921)000-00-00", "test@test.com", "TEST", articuls, 2);
-        
+        repo.regOrder("TEST", "(921)000-00-00", "test@test.com", "TEST", articuls, 2);  
     }
 }

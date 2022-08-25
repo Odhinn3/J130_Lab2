@@ -129,6 +129,7 @@ public class Repository {
                         + dbid + ", '" + LocalDate.now() + "', \""
                         + name + "\", \"" + phone + "\", \"" + email + "\", \"" + address + "\", \"S"  + "\", '" + LocalDate.now() + "')");
             } else {
+               
                 
             }
         } catch (SQLException ex) {

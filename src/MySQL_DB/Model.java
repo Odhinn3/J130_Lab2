@@ -70,44 +70,6 @@ public class Model {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 19 * hash + Objects.hashCode(this.articul);
-        hash = 19 * hash + Objects.hashCode(this.name);
-        hash = 19 * hash + Objects.hashCode(this.color);
-        hash = 19 * hash + this.price;
-        hash = 19 * hash + this.remain;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Model other = (Model) obj;
-        if (this.price != other.price) {
-            return false;
-        }
-        if (this.remain != other.remain) {
-            return false;
-        }
-        if (!Objects.equals(this.articul, other.articul)) {
-            return false;
-        }
-        if (!Objects.equals(this.name, other.name)) {
-            return false;
-        }
-        return Objects.equals(this.color, other.color);
-    }
-    
-    @Override
     public String toString(){
         return
                 "Product: " + articul + ", " + name + ", " + color + ", " +
