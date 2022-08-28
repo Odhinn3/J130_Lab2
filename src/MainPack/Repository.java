@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 /**
  *
  * @author A.Konnov <github.com/Odhinn3>
@@ -116,6 +115,5 @@ public class Repository {
         }
         articuls.clear();
         orderpos.clear();
-
     }
 }

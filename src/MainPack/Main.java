@@ -4,8 +4,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-
 /**
  *
  * @author A.Konnov <github.com/Odhinn3>
