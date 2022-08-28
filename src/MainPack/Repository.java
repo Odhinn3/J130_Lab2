@@ -20,8 +20,6 @@ public class Repository {
     public String url = "jdbc:mysql://localhost:3306/mysql?zeroDateTimeBehavior=CONVERT_TO_NULL";
     public String user = "root";
     public String password = "C_1kr2161240";
-    
-
 
     //получение списка продуктов
     public List<Model> getModelList(){

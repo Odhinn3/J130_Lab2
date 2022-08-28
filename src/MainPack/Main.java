@@ -33,7 +33,6 @@ public class Main {
         orderpos.put("3251619", 10);
         articuls.add("3251619");
         //регистрируем заказ с двумя позициями
-        repo.regOrder("TEST", "(921)000-00-00", "test@test.com", "TEST", articuls, orderpos);
-        
+        repo.regOrder("TEST", "(921)000-00-00", "test@test.com", "TEST", articuls, orderpos); 
     }
 }
