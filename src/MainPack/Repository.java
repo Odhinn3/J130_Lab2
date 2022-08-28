@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  *
  * @author A.Konnov <github.com/Odhinn3>
@@ -41,35 +40,7 @@ public class Repository {
         ex.printStackTrace();
         }
         return list; 
-    }
-        
-    /*public List<Orders> getOrdersListByID(int id) throws SQLException{
-        List<Orders> list = new ArrayList<>();
-        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql?zeroDateTimeBehavior=CONVERT_TO_NULL", "root", "C_1kr2161240");
-                Statement stm = con.createStatement()){
-            ResultSet rs = stm.executeQuery("SELECT * FROM javadev.orders WHERE id = " + id);
-            while (rs.next()){
-                Orders ord = new Orders();
-                ord.setId(rs.getInt(1));
-                ord.setOrderdate(rs.getDate(2).toLocalDate());
-                ord.setCustomername(rs.getString(3));
-                ord.setPhone(rs.getString(4));
-                ord.setEmail(rs.getString(5));
-                ord.setAddress(rs.getString(6));
-                ord.setStatus(rs.getString(7));
-                if (rs.getDate(8) != null){
-                    ord.setShipdate(rs.getDate(8).toLocalDate());
-                } else {
-                    ord.setShipdate(null);
-                }
-                list.add(ord);
-            }
-        } catch (SQLException ex) {
-        ex.printStackTrace();
-        }
-        return list;            
-    }*/
-    
+    } 
     //вывод в консоль списка наименований товаров заказов с заданным ID
     public List<Model> getModelByID(int id){
         List<Model> list = new ArrayList<>();
@@ -99,28 +70,12 @@ public class Repository {
         }
         return list;
     }
-    
+    //регистрация заказа
     public void regOrder(String name, String phone, String email, String address, String[] articuls, int num) throws SQLException{
-        /*if(name == null || phone == null || email == null || address == null ||
+        if(name == null || phone == null || email == null || address == null ||
                 articuls == null || num == 0){
             throw new IllegalArgumentException("Не заданы аргументы!");
-        }
-        int dbid = 0;
-        LocalDate date;
-        try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql?zeroDateTimeBehavior=CONVERT_TO_NULL", "root", "C_1kr2161240");
-            Statement stm = con.createStatement()){
-                ResultSet rs = stm.executeQuery("SELECT MAX(id) FROM javadev.orders");
-                while(rs.next()){
-                dbid = rs.getInt(1);
-                }
-        } catch (SQLException ex) {
-        ex.printStackTrace();
-        }
-        System.out.println(dbid);
-        dbid++;
-        System.out.println(dbid);*/
-        
-        
+        } 
         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql?zeroDateTimeBehavior=CONVERT_TO_NULL", "root", "C_1kr2161240");
             Statement stm = con.createStatement()){
             if(articuls.length==1){
@@ -135,6 +90,20 @@ public class Repository {
                         + "\", (SELECT price FROM javadev.products WHERE javadev.products.articul=\""
                         + articuls[0] + "\"), " + num + ")");
                
+            } else {
+                stm.executeUpdate("INSERT INTO javadev.orders "
+                    + "(id, orderdate, customername, phone, email, address, status, shipdate) VALUES"
+                    + "((SELECT * FROM (SELECT MAX(id) FROM javadev.orders) AS t)+1, '"
+                    + LocalDate.now() + "', \""
+                    + name + "\", \"" + phone + "\", \"" + email + "\", \"" + address
+                    + "\", \"S"  + "\", '" + LocalDate.now() + "')");
+                for (String i : articuls){
+                    String a = i;
+                        stm.executeUpdate("INSERT INTO javadev.orderpos (ordercode, articul, price, num)\n" +
+                            "VALUES ((SELECT MAX(id) FROM javadev.orders), \"" + a
+                            + "\", (SELECT price FROM javadev.products WHERE javadev.products.articul=\""
+                            + a + "\"), " + num + ")");
+                }
             }
         } catch (SQLException ex) {
         ex.printStackTrace();
