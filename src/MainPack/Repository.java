@@ -71,14 +71,14 @@ public class Repository {
         return list;
     }
     //регистрация заказа
-    public void regOrder(String name, String phone, String email, String address, String[] articuls, int num) throws SQLException{
+    public void regOrder(String name, String phone, String email, String address, ArrayList<String> articuls, int num) throws SQLException{
         if(name == null || phone == null || email == null || address == null ||
                 articuls == null || num == 0){
             throw new IllegalArgumentException("Не заданы аргументы!");
         } 
         try (Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mysql?zeroDateTimeBehavior=CONVERT_TO_NULL", "root", "C_1kr2161240");
             Statement stm = con.createStatement()){
-            if(articuls.length==1){
+            if(articuls.size()==1){
                 stm.executeUpdate("INSERT INTO javadev.orders "
                         + "(id, orderdate, customername, phone, email, address, status, shipdate) VALUES"
                         + "((SELECT * FROM (SELECT MAX(id) FROM javadev.orders) AS t)+1, '"
@@ -86,10 +86,9 @@ public class Repository {
                         + name + "\", \"" + phone + "\", \"" + email + "\", \"" + address
                         + "\", \"S"  + "\", '" + LocalDate.now() + "')");
                 stm.executeUpdate("INSERT INTO javadev.orderpos (ordercode, articul, price, num)\n" +
-                    "VALUES ((SELECT MAX(id) FROM javadev.orders), \"" + articuls[0]
+                    "VALUES ((SELECT MAX(id) FROM javadev.orders), \"" + articuls.get(0)
                         + "\", (SELECT price FROM javadev.products WHERE javadev.products.articul=\""
-                        + articuls[0] + "\"), " + num + ")");
-               
+                        + articuls.get(0) + "\"), " + num + ")");
             } else {
                 stm.executeUpdate("INSERT INTO javadev.orders "
                     + "(id, orderdate, customername, phone, email, address, status, shipdate) VALUES"
@@ -97,7 +96,9 @@ public class Repository {
                     + LocalDate.now() + "', \""
                     + name + "\", \"" + phone + "\", \"" + email + "\", \"" + address
                     + "\", \"S"  + "\", '" + LocalDate.now() + "')");
-                for (String i : articuls){
+                ArrayList<String> sec = new ArrayList<>();
+                sec.addAll(articuls);
+                for (String i : sec){
                     String a = i;
                         stm.executeUpdate("INSERT INTO javadev.orderpos (ordercode, articul, price, num)\n" +
                             "VALUES ((SELECT MAX(id) FROM javadev.orders), \"" + a
@@ -108,5 +109,6 @@ public class Repository {
         } catch (SQLException ex) {
         ex.printStackTrace();
         }
+        articuls.clear();
     }
 }

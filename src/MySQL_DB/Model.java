@@ -5,8 +5,6 @@
  */
 package MySQL_DB;
 
-import java.util.Objects;
-
 /**
  *
  * @author A.Konnov <github.com/Odhinn3>

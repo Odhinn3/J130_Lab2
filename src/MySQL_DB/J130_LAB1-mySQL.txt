@@ -1,0 +1,113 @@
+-- создаем таблицы
+CREATE TABLE products (
+    articul CHAR (7) NOT NULL PRIMARY KEY,
+    name VARCHAR (50) DEFAULT NULL,
+    color VARCHAR(20) DEFAULT NULL,
+    price INT DEFAULT NULL CHECK (price > 0),
+    remain INT DEFAULT NULL CHECK (remain > 0 OR remain = 0)
+);
+
+CREATE TABLE orders (
+    id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    orderdate date DEFAULT NULL,
+    customername varchar(100) DEFAULT NULL,
+    phone varchar(50) DEFAULT NULL,
+    email varchar(50) DEFAULT NULL,
+    address varchar(200) DEFAULT NULL,
+    status char(1) DEFAULT NULL,
+    shipdate DATE DEFAULT NULL,
+    CONSTRAINT stat CHECK (status = 'S' AND shipdate IS NOT NULL OR status = 'P'
+    AND shipdate IS NULL OR status = 'C' AND shipdate IS NULL)
+);
+
+CREATE TABLE orderpos (
+    ordercode int NOT NULL,
+    articul char(7) NOT NULL,
+    price int DEFAULT NULL,
+    num int CHECK (num > 0),
+    PRIMARY KEY (ordercode,articul),
+    FOREIGN KEY (ordercode) REFERENCES orders (id),
+    FOREIGN KEY (articul) REFERENCES products (articul)
+);
+
+-- заполняем таблицы по условию задачи
+INSERT INTO products (articul, name, color, price, remain)
+    VALUES  ("3251615", "Стол кухонный", "белый", 8000, 12),
+            ("3251616", "Стол кухонный", "", 8000, 15),
+            ("3251617", "Стул столовый гусарский", "орех", 4000, 2),
+            ("3251618", "Стул столовый с высокой спинкой", "белый", 3500, 37),
+            ("3251619", "Стул столовый с высокой спинкой", "коричневый", 3500, 52);
+
+INSERT INTO orders (id, orderdate, customername, phone, email, address, status, shipdate)
+    VALUES  (1, '2020-11-20', "Сергей Иванов", "(981)123-45-67", "", "ул. Веденеева, 20-1-41", "S", '2020-11-29'),
+            (2, '2020-11-22', "Алексей Комаров", "(921)001-22-33", "", "пр. Пархоменко, 51-2-123", "S", '2020-11-29'),
+            (3, '2020-11-28', "Ирина Викторова", "(911)009-88-77", "", "Тихорецкий пр., 21-21", "P", NULL),
+            (4, '2020-12-03', "Павел Николаев", "", "pasha_nick@mail.ru", "ул. Хлопина, 3-88", "P", NULL),
+            (5, '2020-12-03', "Антонина Васильева", "(931)777-66-55", "antvas66@gmail.com", "пр. Науки, 11-3-9", "P", NULL),
+            (6, '2020-12-10', "Ирина Викторова", "(911)009-88-77", "", "Тихорецкий пр., 21-21", "P", NULL);
+
+INSERT INTO orderpos (ordercode, articul, price, num)
+    VALUES  (1, "3251616", 7500, 1),
+            (2, "3251615", 7500, 1),
+            (3, "3251615", 8000, 1),
+            (3, "3251617", 4000, 4),
+            (4, "3251619", 3500, 2),
+            (5, "3251615", 8000, 1),
+            (5, "3251617", 4000, 4),
+            (6, "3251617", 4000, 2);
+
+-- списки заказов, отгруженных в ноябре, декабре
+SELECT id, orderdate
+    FROM orders
+    WHERE orderdate > '2020-10-31' AND orderdate < '2020-12-01';
+
+SELECT id, orderdate
+    FROM orders
+    WHERE orderdate > '2020-11-30' AND orderdate < '2021-01-01';
+
+-- списки заказов, отгруженных в ноябре, декабре
+SELECT id
+    FROM orders
+    WHERE orderdate > '2020-10-31' AND orderdate < '2020-12-01' AND status = 'S';
+
+SELECT id
+    FROM orders
+    WHERE orderdate > '2020-11-30' AND orderdate < '2021-01-01' AND status = 'S';
+
+-- список клиентов (отсортировал по алфавиту)
+SELECT DISTINCT customername, phone, email
+    FROM orders
+    ORDER BY customername ASC;
+
+-- список позиций с заказа id=3
+SELECT orderpos.articul
+    FROM orderpos, orders
+    WHERE orders.id = orderpos.ordercode AND orders.id = 3;
+
+-- названия товаров заказа id=3
+SELECT products.name
+    FROM products, orders, orderpos
+    WHERE orders.id = orderpos.ordercode AND orders.id = 3 AND orderpos.articul = products.articul;
+
+-- *список отгруженных заказов с количеством позиций   
+SELECT id, COUNT(articul)
+    FROM orders LEFT JOIN orderpos
+    ON orders.id = orderpos.ordercode
+    WHERE orders.status = 'S'
+    GROUP BY id    
+;
+
+-- *список отгруженных заказов с количеством позиций и общей стоимостью  
+SELECT id, COUNT(articul), SUM(price)
+    FROM orders LEFT JOIN orderpos
+    ON orders.id = orderpos.ordercode
+    WHERE orders.status = 'S'
+    GROUP BY id    
+;
+-- запрос, фиксирующий отгрузку заказа id=5. Чтобы не выбрасывало ошибку, изменил остаток гусарских стульев на 2
+UPDATE orders, products, orderpos
+    SET status = 'S',
+        shipdate = CURDATE(),
+        remain = remain-1
+    WHERE id = 5 and id = orderpos.ordercode and orderpos.articul = products.articul
+;
