@@ -70,50 +70,30 @@ public class Repository {
         return list;
     }
     //регистрация заказа
-    public void regOrder(String name, String phone, String email, String address, ArrayList<String> articuls, Map<String, Integer> orderpos) throws SQLException{
+    public void regOrder(String name, String phone, String email, String address, Map<String, Integer> orderpos) throws SQLException{
         if(name == null || phone == null || email == null || address == null ||
-                articuls == null){
+                orderpos == null){
             throw new IllegalArgumentException("Не заданы аргументы!");
         } 
         try (Connection con = DriverManager.getConnection(url, user, password);
             Statement stm = con.createStatement()){
-            if(articuls.size()==1){
-                String a = articuls.get(0);
-                ArrayList<Integer> v = new ArrayList<>(orderpos.values());
-                int n = v.get(0);
                 stm.executeUpdate("INSERT INTO javadev.orders "
                     + "(id, orderdate, customername, phone, email, address, status, shipdate) VALUES"
                     + "((SELECT * FROM (SELECT MAX(id) FROM javadev.orders) AS t)+1, '"
                     + LocalDate.now() + "', \""
                     + name + "\", \"" + phone + "\", \"" + email + "\", \"" + address
                     + "\", \"P"  + "\", null)");
-
-                stm.executeUpdate("INSERT INTO javadev.orderpos (ordercode, articul, price, num)\n" +
-                    "VALUES ((SELECT MAX(id) FROM javadev.orders), \"" + a
-                    + "\", (SELECT price FROM javadev.products WHERE javadev.products.articul=\""
-                    + a + "\"), " + n + ")");
-            } else {
-                stm.executeUpdate("INSERT INTO javadev.orders "
-                    + "(id, orderdate, customername, phone, email, address, status, shipdate) VALUES"
-                    + "((SELECT * FROM (SELECT MAX(id) FROM javadev.orders) AS t)+1, '"
-                    + LocalDate.now() + "', \""
-                    + name + "\", \"" + phone + "\", \"" + email + "\", \"" + address
-                    + "\", \"P"  + "\", null)");
-                ArrayList<String> sec = new ArrayList<>();
-                sec.addAll(articuls);
-                for (String i : sec){
-                    String a = i;
-                    int n = orderpos.get(a);
+                for (Map.Entry o : orderpos.entrySet()){
+                    String a = (String) o.getKey();
+                    int n = (int) o.getValue();
                         stm.executeUpdate("INSERT INTO javadev.orderpos (ordercode, articul, price, num)\n" +
                             "VALUES ((SELECT MAX(id) FROM javadev.orders), \"" + a
                             + "\", (SELECT price FROM javadev.products WHERE javadev.products.articul=\""
                             + a + "\"), " + n + ")");
-                }
             }
         } catch (SQLException ex) {
         ex.printStackTrace();
         }
-        articuls.clear();
         orderpos.clear();
     }
 }
