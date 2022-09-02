@@ -5,27 +5,26 @@
  */
 package MainPack;
 
-import MySQL_DB.Model;
+import db.DBAccess;
+import mod.Model;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author A.Konnov <github.com/Odhinn3>
  */
 public class Repository {
-    public String url = "jdbc:mysql://localhost:3306/mysql?zeroDateTimeBehavior=CONVERT_TO_NULL";
-    public String user = "root";
-    public String password = "C_1kr2161240";
-
+    
     //получение списка продуктов
     public List<Model> getModelList(){
         List<Model> list = new ArrayList<>();
-        try (Connection con = DriverManager.getConnection(url, user, password);
-                Statement stm = con.createStatement()){
-            ResultSet rs = stm.executeQuery("SELECT * FROM javadev.products");
+        try (DBAccess db = new DBAccess()){
+            ResultSet rs = db.getCon().executeQuery("SELECT * FROM javadev.products");
             while (rs.next()){
                 Model mod = new Model();
                 mod.setArticul(rs.getString(1));
@@ -37,15 +36,16 @@ public class Repository {
             }
         } catch (SQLException ex) {
         ex.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(Repository.class.getName()).log(Level.SEVERE, null, ex);
         }
         return list; 
     } 
     //вывод в консоль списка наименований товаров заказов с заданным ID
     public List<Model> getModelByID(int id){
         List<Model> list = new ArrayList<>();
-        try (Connection con = DriverManager.getConnection(url, user, password);
-                Statement stm = con.createStatement()){
-            ResultSet rs = stm.executeQuery("SELECT javadev.products.name, javadev.products.color\n" +
+        try (DBAccess db = new DBAccess()){
+            ResultSet rs = db.getCon().executeQuery("SELECT javadev.products.name, javadev.products.color\n" +
                 "FROM javadev.products, javadev.orders, javadev.orderpos\n" +
                 "WHERE orders.id = orderpos.ordercode AND orders.id = " + id + 
                 " AND orderpos.articul = products.articul");
@@ -66,6 +66,8 @@ public class Repository {
             }
         } catch (SQLException ex) {
         ex.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(Repository.class.getName()).log(Level.SEVERE, null, ex);
         }
         return list;
     }
@@ -75,9 +77,8 @@ public class Repository {
                 orderpos == null){
             throw new IllegalArgumentException("Не заданы аргументы!");
         } 
-        try (Connection con = DriverManager.getConnection(url, user, password);
-            Statement stm = con.createStatement()){
-                stm.executeUpdate("INSERT INTO javadev.orders "
+        try (DBAccess db = new DBAccess()){
+                db.getCon().executeUpdate("INSERT INTO javadev.orders "
                     + "(id, orderdate, customername, phone, email, address, status, shipdate) VALUES"
                     + "((SELECT * FROM (SELECT MAX(id) FROM javadev.orders) AS t)+1, '"
                     + LocalDate.now() + "', \""
@@ -86,13 +87,15 @@ public class Repository {
                 for (Map.Entry o : orderpos.entrySet()){
                     String a = (String) o.getKey();
                     int n = (int) o.getValue();
-                        stm.executeUpdate("INSERT INTO javadev.orderpos (ordercode, articul, price, num)\n" +
+                        db.getCon().executeUpdate("INSERT INTO javadev.orderpos (ordercode, articul, price, num)\n" +
                             "VALUES ((SELECT MAX(id) FROM javadev.orders), \"" + a
                             + "\", (SELECT price FROM javadev.products WHERE javadev.products.articul=\""
                             + a + "\"), " + n + ")");
             }
         } catch (SQLException ex) {
         ex.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(Repository.class.getName()).log(Level.SEVERE, null, ex);
         }
         orderpos.clear();
     }
