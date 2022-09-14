@@ -4,12 +4,10 @@
  */
 package gui;
 
-import dnl.utils.text.table.TextTable;
 import java.awt.Container;
 
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,11 +15,12 @@ import MainPack.Repository;
 import javax.swing.JTextField;
 
 
+
 /**
  *
  * @author A.Konnov <github.com/Odhinn3>
  */
-import MainPack.DataBaseProperties;
+
 public class MainFrame extends JFrame {
 
     public MainFrame() {
@@ -31,37 +30,53 @@ public class MainFrame extends JFrame {
         init();
         setVisible(true);
     }
-    
     JButton butt = new JButton("View table");
-    JTextField t1 = new JTextField(DataBaseProperties.get().getProperty("db.url"));
-    JTextField t2 = new JTextField("javadev.products");
- 
+    JTextField t1 = new JTextField();
+    JTextField t2 = new JTextField();
+
+    private static String f1;
+    private static String f2;
+
     private void init() {
         Container con = getContentPane();
         con.setLayout(new BoxLayout(con, BoxLayout.Y_AXIS));
 
-
-        ActionListener bl = new ButtonListener();
-        butt.addActionListener(bl);
+        butt.addActionListener((ActionEvent e) -> {
+            Repository repo = new Repository();
+            t1.setText(repo.getModelList().toString());
+        });
         con.add(t1);
         con.add(t2);
         con.add(butt);
+        if(f1==null){
+            t1.addActionListener((ActionEvent e) -> {
+                setF1(t1.getText());
+                t1.getText();
+                System.out.println(getF1());
+            });
+        }
+        if(f2==null){
+            t2.addActionListener((ActionEvent e) -> {
+                setF2(t2.getText());
+                t2.getText();
+                System.err.println(getF2());
+            });
+        }
     }
 
-    private class ButtonListener implements ActionListener{
+    public static String getF1() {
+        return f1;
+    }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            Repository repo = new Repository();
-            
-            t1.setText(repo.getModelList().toString());
-        }
-        
-    } 
+    private void setF1(String f1) {
+        this.f1 = f1;
+    }
     
-    
+    public static String getF2() {
+        return f2;
+    }
 
-
-
-    //TextTable tt = new TextTable(columnNames, data);
+    private void setF2(String f2) {
+        this.f2 = f2;
+    }  
 }

@@ -6,6 +6,8 @@ package db;
 
 
 import MainPack.DataBaseProperties;
+import static gui.MainFrame.getF1;
+import static gui.MainFrame.getF2;
 import java.sql.*;
 
 
@@ -15,7 +17,11 @@ import java.sql.*;
  * @author A.Konnov <github.com/Odhinn3>
  */
 public class DBAccess implements AutoCloseable{
-    private String url = DataBaseProperties.get().getProperty("db.url");
+    
+    
+    //private String url = DataBaseProperties.get().getProperty("db.url");
+    private String url = getF1();
+
     private String user = DataBaseProperties.get().getProperty("db.user");
     private String password = DataBaseProperties.get().getProperty("db.password");
 

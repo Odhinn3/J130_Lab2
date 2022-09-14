@@ -6,6 +6,7 @@
 package MainPack;
 
 import db.DBAccess;
+import static gui.MainFrame.getF2;
 import mod.Model;
 import java.sql.*;
 import java.time.LocalDate;
@@ -19,11 +20,12 @@ import java.util.logging.Logger;
  * @author A.Konnov <github.com/Odhinn3>
  */
 public class Repository {
+    private final String table = getF2();
     
     //получение списка продуктов
     public List<Model> getModelList(){
         List<Model> list = new ArrayList<>();
-        String query = "SELECT * FROM javadev.products";
+        String query = "SELECT * FROM " + table;
         try (DBAccess db = new DBAccess()){
             ResultSet rs = db.getExecuteQuery(query);
             while (rs.next()){
@@ -35,7 +37,6 @@ public class Repository {
                 mod.setRemain(rs.getInt(5));
                 list.add(mod);
             }
-            rs.close();
             db.close();
         } catch (Exception ex) {
             Logger.getLogger(Repository.class.getName()).log(Level.SEVERE, null, ex);
