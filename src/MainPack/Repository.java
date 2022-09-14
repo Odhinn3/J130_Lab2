@@ -23,8 +23,9 @@ public class Repository {
     //получение списка продуктов
     public List<Model> getModelList(){
         List<Model> list = new ArrayList<>();
+        String query = "SELECT * FROM javadev.products";
         try (DBAccess db = new DBAccess()){
-            ResultSet rs = db.getCon().executeQuery("SELECT * FROM javadev.products");
+            ResultSet rs = db.getExecuteQuery(query);
             while (rs.next()){
                 Model mod = new Model();
                 mod.setArticul(rs.getString(1));
@@ -34,21 +35,23 @@ public class Repository {
                 mod.setRemain(rs.getInt(5));
                 list.add(mod);
             }
-        } catch (SQLException ex) {
-        ex.printStackTrace();
+            rs.close();
+            db.close();
         } catch (Exception ex) {
             Logger.getLogger(Repository.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         return list; 
     } 
     //вывод в консоль списка наименований товаров заказов с заданным ID
     public List<Model> getModelByID(int id){
         List<Model> list = new ArrayList<>();
+        String query = "SELECT javadev.products.name, javadev.products.color\\n\" +\n" +
+"                \"FROM javadev.products, javadev.orders, javadev.orderpos\\n\" +\n" +
+"                \"WHERE orders.id = orderpos.ordercode AND orders.id = \" + id + \n" +
+"                \" AND orderpos.articul = products.articul";
         try (DBAccess db = new DBAccess()){
-            ResultSet rs = db.getCon().executeQuery("SELECT javadev.products.name, javadev.products.color\n" +
-                "FROM javadev.products, javadev.orders, javadev.orderpos\n" +
-                "WHERE orders.id = orderpos.ordercode AND orders.id = " + id + 
-                " AND orderpos.articul = products.articul");
+            ResultSet rs = db.getExecuteQuery(query);
             while (rs.next()){
                 Model mod = new Model();
                 mod.setName(rs.getString(1));
@@ -78,7 +81,7 @@ public class Repository {
             throw new IllegalArgumentException("Не заданы аргументы!");
         } 
         try (DBAccess db = new DBAccess()){
-                db.getCon().executeUpdate("INSERT INTO javadev.orders "
+                db.getExecuteUpdate("INSERT INTO javadev.orders "
                     + "(id, orderdate, customername, phone, email, address, status, shipdate) VALUES"
                     + "((SELECT * FROM (SELECT MAX(id) FROM javadev.orders) AS t)+1, '"
                     + LocalDate.now() + "', \""
@@ -87,7 +90,7 @@ public class Repository {
                 for (Map.Entry o : orderpos.entrySet()){
                     String a = (String) o.getKey();
                     int n = (int) o.getValue();
-                        db.getCon().executeUpdate("INSERT INTO javadev.orderpos (ordercode, articul, price, num)\n" +
+                        db.getExecuteUpdate("INSERT INTO javadev.orderpos (ordercode, articul, price, num)\n" +
                             "VALUES ((SELECT MAX(id) FROM javadev.orders), \"" + a
                             + "\", (SELECT price FROM javadev.products WHERE javadev.products.articul=\""
                             + a + "\"), " + n + ")");
@@ -99,4 +102,5 @@ public class Repository {
         }
         orderpos.clear();
     }
+    
 }

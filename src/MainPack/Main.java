@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class Main {
     public static void main(String[] args) throws SQLException{
-//        //в БД из J130_1 сейчас 6 заказов с 8 позициями
+        //в БД из J130_1 сейчас 6 заказов с 8 позициями
 //        Repository repo = new Repository();
 //        Map<String, Integer> orderpos = new HashMap<String, Integer>();
 //        //добавляем одну позицию

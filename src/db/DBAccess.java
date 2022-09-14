@@ -5,7 +5,9 @@
 package db;
 
 
+import MainPack.DataBaseProperties;
 import java.sql.*;
+
 
 
 /**
@@ -13,17 +15,27 @@ import java.sql.*;
  * @author A.Konnov <github.com/Odhinn3>
  */
 public class DBAccess implements AutoCloseable{
-    private String url = "jdbc:mysql://localhost:3306/mysql?zeroDateTimeBehavior=CONVERT_TO_NULL";
-    private String user = "root";
-    private String password = "C_1kr2161240";
+    private String url = DataBaseProperties.get().getProperty("db.url");
+    private String user = DataBaseProperties.get().getProperty("db.user");
+    private String password = DataBaseProperties.get().getProperty("db.password");
 
     public DBAccess() {
     }
     //MySQL connection method
-    public Statement getCon() throws SQLException{
+    public ResultSet getExecuteQuery(String query) throws SQLException{
+        Statement stm;
         Connection con = DriverManager.getConnection(url, user, password);
-        Statement stm = con.createStatement();
-        return stm;
+        stm = con.createStatement();
+        return stm.executeQuery(query);
+        
+    }
+    
+    public int getExecuteUpdate(String query) throws SQLException{
+        Statement stm;
+        try (Connection con = DriverManager.getConnection(url, user, password)) {
+            stm = con.createStatement();
+        return stm.executeUpdate(query);
+        }
     }
 
     public String getUrl() {
@@ -52,6 +64,6 @@ public class DBAccess implements AutoCloseable{
 
     @Override
     public void close() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
+        System.out.println("closed");
     }
 }
