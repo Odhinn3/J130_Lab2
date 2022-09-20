@@ -16,8 +16,8 @@ import java.util.logging.Logger;
  * @author A.Konnov <github.com/Odhinn3>
  */
 public class DataBaseProperties extends Properties {
-    private static DataBaseProperties dbp;
     
+    private static DataBaseProperties dbp; 
     private DataBaseProperties(){}
     
     public static DataBaseProperties get(){

@@ -1,16 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package db;
 
-
 import MainPack.DataBaseProperties;
-import static gui.MainFrame.getF1;
-import static gui.MainFrame.getF2;
 import java.sql.*;
-
-
+import static gui.MainFrame.getF1;
 
 /**
  *
@@ -19,9 +12,8 @@ import java.sql.*;
 public class DBAccess implements AutoCloseable{
     
     
-    //private String url = DataBaseProperties.get().getProperty("db.url");
+//    private String url = DataBaseProperties.get().getProperty("db.url");
     private String url = getF1();
-
     private String user = DataBaseProperties.get().getProperty("db.user");
     private String password = DataBaseProperties.get().getProperty("db.password");
 

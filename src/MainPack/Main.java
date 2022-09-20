@@ -23,11 +23,10 @@ public class Main {
 //        //регистрируем заказ с двумя позициями
 //        repo.regOrder("TEST", "(921)000-00-00", "test@test.com", "TEST", orderpos);
 //        System.out.println("-----");
-//        repo.getModelList().forEach(System.out::println);
+//        repo.getModelList("javadev.orders").forEach(System.out::println);
 //        System.out.println("-----");
 //        repo.getModelByID(7);
 //        repo.getModelByID(8);
         MainFrame fr = new MainFrame();
-        
     }
 }

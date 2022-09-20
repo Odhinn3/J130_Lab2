@@ -6,7 +6,6 @@
 package MainPack;
 
 import db.DBAccess;
-import static gui.MainFrame.getF2;
 import mod.Model;
 import java.sql.*;
 import java.time.LocalDate;
@@ -20,28 +19,49 @@ import java.util.logging.Logger;
  * @author A.Konnov <github.com/Odhinn3>
  */
 public class Repository {
-    private final String table = getF2();
+    
     
     //получение списка продуктов
-    public List<Model> getModelList(){
+    public List<Model> getModelList(String table){
+        
         List<Model> list = new ArrayList<>();
         String query = "SELECT * FROM " + table;
         try (DBAccess db = new DBAccess()){
             ResultSet rs = db.getExecuteQuery(query);
             while (rs.next()){
-                Model mod = new Model();
-                mod.setArticul(rs.getString(1));
-                mod.setName(rs.getString(2));
-                mod.setColor(rs.getString(3));
-                mod.setPrice(rs.getInt(4));
-                mod.setRemain(rs.getInt(5));
-                list.add(mod);
+                if(table.equals("javadev.products")){
+                    Model mod = new Model();
+                    mod.setArticul(rs.getString(1));
+                    mod.setName(rs.getString(2));
+                    mod.setColor(rs.getString(3));
+                    mod.setPrice(rs.getInt(4));
+                    mod.setRemain(rs.getInt(5));
+                    list.add(mod);
+                } else if(table.equals("javadev.orders")){
+                    Model mod = new Model();
+                    mod.setId(rs.getInt(1));
+                    mod.setOrderdate(rs.getDate(2).toLocalDate());
+                    mod.setCustomername(rs.getString(3));
+                    mod.setPhone(rs.getString(4));
+                    mod.setEmail(rs.getString(5));
+                    mod.setAddress(rs.getString(6));
+                    mod.setStatus(rs.getString(7));
+                    if(rs.getDate(8)!=null) mod.setShipdate(rs.getDate(8).toLocalDate());
+                    else mod.setShipdate(null);
+                    list.add(mod);
+                } else if(table.equals("javadev.orderpos")){
+                    Model mod = new Model();
+                    mod.setOrdercode(rs.getInt(1));
+                    mod.setArticul(rs.getString(2));
+                    mod.setPrice(rs.getInt(3));
+                    mod.setNumber(rs.getInt(4));
+                    list.add(mod);
+                }
             }
-            db.close();
+//            db.close();
         } catch (Exception ex) {
             Logger.getLogger(Repository.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         return list; 
     } 
     //вывод в консоль списка наименований товаров заказов с заданным ID
@@ -59,12 +79,12 @@ public class Repository {
                 if(rs.getString(2) != null){
                     mod.setColor(rs.getString(2));
                 } else {
-                    mod.color = null;
+                    mod.setColor(null);
                 }
-                if(mod.color != null){
-                    System.out.println("Order " + id + ": " + mod.name + ", " + mod.color);
+                if(mod.getColor() != null){
+                    System.out.println("Order " + id + ": " + mod.getName() + ", " + mod.getColor());
                 } else {
-                    System.out.println("Order " + id + ": " + mod.name);
+                    System.out.println("Order " + id + ": " + mod.getName());
                 }
                 list.add(mod);
             }
@@ -103,5 +123,6 @@ public class Repository {
         }
         orderpos.clear();
     }
+    
     
 }
